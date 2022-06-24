@@ -3,19 +3,21 @@ import api from '../../Shared/api';
 import { deleteCookie, getCookie } from '../../Shared/Cookie';
 
 // import Like from "../../components/Like";
-const SET_POST = 'SET_POST'; //
+const LOAD_POST = 'LOAD_POST'; //
+const ADD_IMG = 'ADD_IMG'; //사진 추가
 const ADD_POST = 'ADD_POST'; //포스터추가
 const EDIT_POST = 'EDIT_POST'; //
-const LOAD_POST = 'LOAD_POST'; // 불러오기?
+// const SET_POST = 'SET_POST'; // 셋하기
 // const LIKE_POST = 'LIKE_POST'; // 좋아요
 const DELETE_POST = 'DELETE_POST'; // 삭제
 
 //Call NormalList
-const setPost = (payload) => ({ type: SET_POST, payload });
+const loadPost = (payload) => ({ type: LOAD_POST, payload });
+const addImg = (payload) => ({ type: ADD_IMG, payload });
 const addPost = (payload) => ({ type: ADD_POST, payload });
 const editPost = (payload) => ({ type: EDIT_POST, payload });
-const deletepost = (payload) => ({ type: DELETE_POST, payload });
-const loadpost = (payload) => ({ type: LOAD_POST, payload });
+const deletepost = (id) => ({ type: DELETE_POST, id });
+// const setpost = (payload) => ({ type: SET_POST, payload });
 // const likePost = (payload) => ({ type: LIKE_POST, payload });
 
 const initialState = {
@@ -27,7 +29,7 @@ const initialState = {
 
 // load와 add 코드
 
-export const __setPost = (payload) => async (dispatch, getState) => {
+export const __loadPost = (payload) => async (dispatch, getState) => {
     const myToken = getCookie('Authorization');
     try {
         const response = await api.get(
@@ -46,9 +48,9 @@ export const __setPost = (payload) => async (dispatch, getState) => {
             }
         );
         console.log(response);
-        dispatch(setPost(response.data));
+        dispatch(loadPost(response.data));
     } catch (error) {
-        console.log('setpost error');
+        console.log('loadpost error');
     }
 };
 
@@ -81,7 +83,7 @@ export const __addPost = (payload) => async (dispatch, getState) => {
 export const __editPost = (payload, index) => async (dispatch, getState) => {
     const myToken = getCookie('Authorization');
     try {
-        const data = await api.put(`api/articles/${index}`, payload, {
+        const data = await api.put(`api/post/${index}`, payload, {
             headers: {
                 Authorization: `Bearer ${myToken}`,
             },
@@ -93,25 +95,25 @@ export const __editPost = (payload, index) => async (dispatch, getState) => {
     }
 };
 
-export const __loadpost = (payload) => async (dispatch, getState) => {
-    const myToken = getCookie('Authorization');
-    try {
-        const response = await api.get(`/api/post/show/${payload.text}`, {
-            headers: {
-                Authorization: `bearer ${myToken}`,
-            },
-        });
-        console.log(response);
-        dispatch(loadpost(response.data));
-    } catch (error) {
-        console.log('loading error');
-    }
-};
+// export const __setpost = (payload) => async (dispatch, getState) => {
+//     const myToken = getCookie('Authorization');
+//     try {
+//         const response = await api.get(`/api/post/show/${payload.text}`, {
+//             headers: {
+//                 Authorization: `bearer ${myToken}`,
+//             },
+//         });
+//         console.log(response);
+//         dispatch(setpost(response.data));
+//     } catch (error) {
+//         console.log('loading error');
+//     }
+// };
 
 export const __deletepost = (payload) => async (dispatch, getState) => {
     const myToken = deleteCookie('Authorization');
     try {
-        const request = await api.delete(`/api/comment/${payload.post_id}`, {
+        const request = await api.delete(`/api/${payload.post_id}`, {
             headers: {
                 Authorization: `bearer ${myToken}`,
             },
@@ -125,8 +127,10 @@ export const __deletepost = (payload) => async (dispatch, getState) => {
 
 const postReducer = (state = initialState, { type, payload }) => {
     switch (type) {
-        case SET_POST:
+        case ADD_IMG:
             return { ...state, list: payload };
+        // case SET_POST:
+        //     return { ...state, list: payload };
         case ADD_POST:
             return { ...state, list: [...state.list, payload] };
         case EDIT_POST:

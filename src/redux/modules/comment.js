@@ -19,7 +19,7 @@ export const __addComment = (payload) => async (dispatch, getState) => {
     const myToken = getCookie('Authorization');
     try {
         const data = await api.post(
-            `/api/post/${post_id}/comment`,
+            `/api/${post_id}/comment`,
             {
                 nickname: payload.nickname,
                 comment: payload.comment,
@@ -39,7 +39,7 @@ export const __addComment = (payload) => async (dispatch, getState) => {
 export const __editComment = () => async (dispatch, getState) => {
     const myToken = setCookie('Authorization');
     try {
-        const data = await api.delete(`api/comment/${id}`, {
+        const data = await api.delete(`api/post/comment/${id}`, {
             Authorization: `Bearer ${myToken}`,
         });
         dispatch(editComment(data.data));
@@ -51,7 +51,7 @@ export const __editComment = () => async (dispatch, getState) => {
 export const __deleteComment = () => async (dispatch, getState) => {
     const myToken = deleteCookie('Authorization');
     try {
-        const request = await api.delete(`api/comment/${id}`, {
+        const request = await api.delete(`api/post/comment/${id}`, {
             Authorization: `Bearer ${myToken}`,
         });
         dispatch(deleteComment(request.data));
